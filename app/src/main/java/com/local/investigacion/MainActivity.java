@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 String currentState =(String) state.get(i);
-                Pattern pat = Pattern.compile(", Nombre: (.*), Edad: (\\d+)");
+                Pattern pat = Pattern.compile("Codigo: (\\d+), Nombre: (.*), Edad: (\\d+)");
                 Matcher mat = pat.matcher(currentState);
                 mat.find();
                 Log.i("debug","Nombre: "+mat.group(1)+" edad: "+mat.group(2));
@@ -95,14 +95,14 @@ public class MainActivity extends AppCompatActivity {
                 dialogo1.setCancelable(true);
                 dialogo1.setPositiveButton("Editar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
-                        add.setEnabled(false);
+                        add.setText("cancelar");
                         delete.setEnabled(true);
-                        name.setText(mat.group(1));
-                        age.setText(mat.group(2));
+                        name.setText(mat.group(2));
+                        age.setText(mat.group(3));
                         delete.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                newReg(String.valueOf(i));
+                                newReg(mat.group(1));
                             }
                         });
                         Toast.makeText(getApplicationContext(), "Click en Editar, para Editar registro", LENGTH_SHORT).show();
@@ -123,11 +123,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void add(View view) {
-        newReg(newId);
+        if(add.getText().toString().equals("agregar"))
+            newReg(newId);
+        if(add.getText().toString().equals("cancelar")) {
+            add.setText("agregar");
+            Toast.makeText(this, "Edicion Cancelada", LENGTH_SHORT).show();
+            name.setText("");
+            age.setText("");
+            delete.setEnabled(false);
+        }
     }
 
     private void newReg(String id){
-        if(!name.getText().toString().equals("") || !age.getText().toString().equals("")){
+        if(name.getText().toString().equals("") || age.getText().toString().equals(""))
+            Toast.makeText(this, "No se puede dejar campos vacios", LENGTH_SHORT).show();
+        else{
             Map info = new HashMap();
             info.put("nombre", name.getText().toString());
             info.put("edad", Long.parseLong(age.getText().toString()));
@@ -137,8 +147,7 @@ public class MainActivity extends AppCompatActivity {
             name.setText("");
             age.setText("");
             delete.setEnabled(false);
-            add.setEnabled(true);
+            add.setText("agregar");
         }
-        else Toast.makeText(this, "No se puede dejar campos vacios", LENGTH_SHORT).show();
     }
 }
