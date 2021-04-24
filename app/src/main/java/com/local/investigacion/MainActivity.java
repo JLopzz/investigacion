@@ -63,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 state.clear();
                 ArrayList<Map> value =(ArrayList<Map>) dataSnapshot.getValue();
-                newId = String.valueOf(value.size());
                 for (Map a: value)
                     if(!Objects.isNull(a)) {
                         String nombre = (String) a.get("nombre");
                         Long edad = (Long) a.get("edad");
                         Long cod = (Long) a.get("codigo");
+                        newId = String.valueOf(cod+1);
                         state.add("Codigo: " + cod + ", Nombre: " + nombre + ", Edad: " + edad);
                     }
                 adap.notifyDataSetChanged();
@@ -87,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
                 Pattern pat = Pattern.compile("Codigo: (\\d+), Nombre: (.*), Edad: (\\d+)");
                 Matcher mat = pat.matcher(currentState);
                 mat.find();
-                Log.i("debug","Nombre: "+mat.group(1)+" edad: "+mat.group(2));
+                Log.i("debug",i+" => codigo: "+mat.group(1)+"Nombre: "+mat.group(2)+" edad: "+mat.group(3));
 
                 AlertDialog.Builder dialogo1 = new AlertDialog.Builder(MainActivity.this);
                 dialogo1.setTitle("Opciones de Registros");
-                dialogo1.setMessage("¿ Desea Editar o Eliminar el registro?");
+                dialogo1.setMessage("¿Desea Editar o Eliminar el registro de "+ mat.group(2)+"?");
                 dialogo1.setCancelable(true);
                 dialogo1.setPositiveButton("Editar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 dialogo1.setNegativeButton("Eliminar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dial1, int id) {
-                        db.child(String.valueOf(i)).removeValue();
+                        db.child(mat.group(1)).removeValue();
                         Toast.makeText(getApplicationContext(), "Se ha eliminado con Exito", LENGTH_SHORT).show();
                     }
                 });
